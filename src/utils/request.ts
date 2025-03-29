@@ -1,5 +1,29 @@
 import { getConfig } from "./template";
 
+import config from "../../app-config.json";
+
+const apiUrl = config.template.apiUrl;
+const apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmY2FrcWpvcWJpcW5qYmdmc2V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzOTU1OTYsImV4cCI6MjA1Nzk3MTU5Nn0.GoeNNjqr833dtla8kb730tVhEEaPoV84ykoNjkedscY";
+
+export async function fetchData(path: string, fallbackValue: any = []) {
+  try {
+    const response = await fetch(`${apiUrl}${path}?apikey=${apiKey}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("An error occurred while fetching data. Falling back to default value!", error);
+    return fallbackValue;
+  }
+}
+
 const API_URL = getConfig((config) => config.template.apiUrl);
 
 const mockUrls = import.meta.glob<{ default: string }>("../mock/*.json", {
@@ -12,7 +36,7 @@ export async function request<T>(
   options?: RequestInit
 ): Promise<T> {
   const url = API_URL
-    ? `${API_URL}${path}`
+    ? `${API_URL}${path}?apikey=${apiKey}`
     : mockUrls[`../mock${path}.json`]?.default;
 
   if (!API_URL) {
