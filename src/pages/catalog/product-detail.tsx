@@ -8,6 +8,7 @@ import RelatedProducts from "./related-products";
 import { useAddToCart } from "@/hooks";
 import { Button } from "zmp-ui";
 import Section from "@/components/section";
+import DOMPurify from "dompurify";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -54,9 +55,12 @@ export default function ProductDetailPage() {
           <>
             <div className="bg-background h-2 w-full"></div>
             <Section title="Mô tả sản phẩm">
-              <div className="text-sm whitespace-pre-wrap text-subtitle p-4 pt-2">
-                {product.detail}
-              </div>
+              <div
+                className="text-sm whitespace-pre-wrap text-subtitle p-4 pt-2"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(product.detail),
+                }}
+              />
             </Section>
           </>
         )}
